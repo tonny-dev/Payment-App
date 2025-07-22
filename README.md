@@ -2,6 +2,8 @@
 
 > A robust, production-grade React Native mobile application with Node.js backend for payment processing, implementing industry-standard security practices and modern architecture patterns.
 
+📚 [View Full API Documentation](./api-docs.md)
+
 ## 🎯 Core Features
 
 - **Secure Authentication**: JWT-based with role management
@@ -12,12 +14,14 @@
 ## 🏗 Technical Stack
 
 ### Backend Infrastructure
+
 - **Runtime**: Node.js with Express
 - **Language**: TypeScript
 - **Database**: SQLite (Production-ready for PostgreSQL migration)
 - **Security**: JWT, Rate Limiting, Input Validation
 
 ### Frontend Architecture
+
 - **Framework**: React Native
 - **State Management**: Redux Toolkit
 - **UI Components**: React Native Paper
@@ -41,6 +45,7 @@ npx react-native run-android # Android
 ## ✅ Implementation Checklist
 
 ### Backend Components
+
 - [x] Type-safe REST API implementation
 - [x] Secure authentication flow
 - [x] Optimized database queries
@@ -51,6 +56,7 @@ npx react-native run-android # Android
 - [x] Performance optimizations
 
 ### Frontend Components
+
 - [x] TypeScript integration
 - [x] Redux Toolkit state management
 - [x] Secure token handling
@@ -62,7 +68,9 @@ npx react-native run-android # Android
 ## 🛠 Technical Architecture
 
 ### Performance Optimizations
+
 #### Backend
+
 - Database connection pooling
 - Response compression
 - Rate limiting implementation
@@ -70,6 +78,7 @@ npx react-native run-android # Android
 - Memory-optimized file handling
 
 #### Frontend
+
 - Normalized Redux state
 - Virtualized lists
 - Asset optimization
@@ -77,6 +86,7 @@ npx react-native run-android # Android
 - Input debouncing
 
 ### Security Implementation
+
 - JWT with expiration
 - Bcrypt password hashing (12 rounds)
 - Input validation
@@ -110,12 +120,12 @@ CREATE TABLE transactions (
 
 ## 🔌 API Endpoints
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/auth/signup` | User registration | No |
-| POST | `/api/auth/login` | Authentication | No |
-| GET | `/api/transactions` | Transaction list | Yes |
-| POST | `/api/send` | Payment processing | Yes |
+| Method | Endpoint            | Description        | Auth Required |
+| ------ | ------------------- | ------------------ | ------------- |
+| POST   | `/api/auth/signup`  | User registration  | No            |
+| POST   | `/api/auth/login`   | Authentication     | No            |
+| GET    | `/api/transactions` | Transaction list   | Yes           |
+| POST   | `/api/send`         | Payment processing | Yes           |
 
 ## 🔧 Configuration
 
