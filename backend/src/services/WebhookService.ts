@@ -10,9 +10,12 @@ interface PaymentWebhookData {
 }
 
 export class WebhookService {
-  private static readonly WEBHOOK_URL = 'https://webhook.site/unique-id'; // Replace with actual webhook URL
+  private static readonly WEBHOOK_URL =
+    'https://usewebhook.com/02ab5031c7b88a66f5bff68b6130b30e'; // Replace with actual webhook URL
 
-  public static async triggerPaymentWebhook(data: PaymentWebhookData): Promise<void> {
+  public static async triggerPaymentWebhook(
+    data: PaymentWebhookData
+  ): Promise<void> {
     try {
       const payload = {
         event: 'payment.sent',
@@ -23,20 +26,23 @@ export class WebhookService {
           amount: data.amount,
           currency: data.currency,
           timestamp: data.timestamp,
-          status: 'completed'
+          status: 'completed',
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       await axios.post(this.WEBHOOK_URL, payload, {
         timeout: 5000,
         headers: {
           'Content-Type': 'application/json',
-          'User-Agent': 'PaymentApp-Webhook/1.0'
-        }
+          'User-Agent': 'PaymentApp-Webhook/1.0',
+        },
       });
 
-      console.log('Webhook triggered successfully for transaction:', data.transactionId);
+      console.log(
+        'Webhook triggered successfully for transaction:',
+        data.transactionId
+      );
     } catch (error) {
       console.error('Failed to trigger webhook:', error);
       throw error;
