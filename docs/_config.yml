@@ -1,0 +1,8 @@
+title: Payment App Documentation
+description: Full documentation for the Payment App
+theme: jekyll-theme-cayman
+
+# Navigation
+header_pages:
+  - index.md
+  - api.md
