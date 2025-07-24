@@ -18,16 +18,7 @@ COPY src/ ./src/
 RUN echo "Starting build process..." && \
     npm run build || (echo "Build failed!" && exit 1) && \
     echo "Build completed." && \
-    ls -la dist/ || (echo "dist directory not found!" && exit 1)OM node:18-alpine AS builder
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
-
-# Install dependencies including dev dependencies for building
-RUN npm ci
+    ls -la dist/ || (echo "dist directory not found!" && exit 1)
 
 # Copy source code and configuration
 COPY src/ ./src/
