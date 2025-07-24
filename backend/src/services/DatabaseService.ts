@@ -18,6 +18,18 @@ export class DatabaseService {
     return DatabaseService.instance;
   }
 
+  public async runHealthCheck(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.db.get('SELECT 1', (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
   public initialize(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.db.serialize(() => {

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Logger from './Logger';
 
 interface PaymentWebhookData {
   transactionId: number;
@@ -11,7 +12,30 @@ interface PaymentWebhookData {
 
 export class WebhookService {
   private static readonly WEBHOOK_URL =
-    'https://usewebhook.com/02ab5031c7b88a66f5bff68b6130b30e'; // Replace with actual webhook URL
+    process.env.WEBHOOK_URL ||
+    'https://usewebhook.com/02ab5031c7b88a66f5bff68b6130b30e';
+  private static readonly WEBHOOK_TIMEOUT = parseInt(
+    process.env.WEBHOOK_TIMEOUT || '5000',
+    10
+  );
+  private static readonly MAX_RETRIES = parseInt(
+    process.env.WEBHOOK_MAX_RETRIES || '3',
+    10
+  );
+
+  public static async checkHealth(): Promise<void> {
+    try {
+      await axios.get(this.WEBHOOK_URL, {
+        timeout: this.WEBHOOK_TIMEOUT,
+        headers: {
+          'User-Agent': 'PaymentApp-Webhook/1.0',
+        },
+      });
+    } catch (error) {
+      Logger.error('Webhook health check failed:', error);
+      throw error;
+    }
+  }
 
   public static async triggerPaymentWebhook(
     data: PaymentWebhookData
