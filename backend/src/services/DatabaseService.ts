@@ -1,23 +1,7 @@
 import sqlite3 from 'sqlite3';
 import bcrypt from 'bcryptjs';
-
-export interface User {
-  id: number;
-  email: string;
-  password: string;
-  role: 'psp' | 'dev';
-  created_at: string;
-}
-
-export interface Transaction {
-  id: number;
-  user_id: number;
-  recipient: string;
-  amount: number;
-  currency: string;
-  status: 'pending' | 'completed' | 'failed';
-  timestamp: string;
-}
+import { User } from '../models/User';
+import { Transaction } from '../models/Transaction';
 
 export class DatabaseService {
   private static instance: DatabaseService;
@@ -49,7 +33,8 @@ export class DatabaseService {
         `);
 
         // Create transactions table
-        this.db.run(`
+        this.db.run(
+          `
           CREATE TABLE IF NOT EXISTS transactions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
@@ -60,31 +45,35 @@ export class DatabaseService {
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
           )
-        `, (err) => {
-          if (err) reject(err);
-          else resolve();
-        });
+        `,
+          (err) => {
+            if (err) reject(err);
+            else resolve();
+          }
+        );
       });
     });
   }
 
   // User methods
-  public async createUser(email: string, password: string, role: 'psp' | 'dev'): Promise<User> {
-    const hashedPassword = await bcrypt.hash(password, 12);
-    
+  public async createUser(
+    email: string,
+    password: string,
+    role: 'psp' | 'dev'
+  ): Promise<User> {
     return new Promise((resolve, reject) => {
       this.db.run(
         'INSERT INTO users (email, password, role) VALUES (?, ?, ?)',
-        [email, hashedPassword, role],
-        function(err) {
+        [email, password, role],
+        function (err) {
           if (err) reject(err);
           else {
             resolve({
               id: this.lastID,
               email,
-              password: hashedPassword,
+              password,
               role,
-              created_at: new Date().toISOString()
+              created_at: new Date().toISOString(),
             });
           }
         }
@@ -120,27 +109,53 @@ export class DatabaseService {
 
   // Transaction methods
   public async createTransaction(
-    userId: number,
-    recipient: string,
-    amount: number,
-    currency: string
+    transaction: Omit<Transaction, 'id'>
   ): Promise<Transaction> {
     return new Promise((resolve, reject) => {
       this.db.run(
-        'INSERT INTO transactions (user_id, recipient, amount, currency, status) VALUES (?, ?, ?, ?, ?)',
-        [userId, recipient, amount, currency, 'completed'],
-        function(err) {
+        'INSERT INTO transactions (user_id, recipient, amount, currency, status, timestamp) VALUES (?, ?, ?, ?, ?, ?)',
+        [
+          transaction.user_id,
+          transaction.recipient,
+          transaction.amount,
+          transaction.currency,
+          transaction.status,
+          transaction.timestamp,
+        ],
+        function (err) {
           if (err) reject(err);
           else {
             resolve({
               id: this.lastID,
-              user_id: userId,
-              recipient,
-              amount,
-              currency,
-              status: 'completed',
-              timestamp: new Date().toISOString()
+              ...transaction,
             });
+          }
+        }
+      );
+    });
+  }
+
+  public async updateTransactionStatus(
+    transactionId: number,
+    status: 'pending' | 'completed' | 'failed'
+  ): Promise<Transaction> {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'UPDATE transactions SET status = ? WHERE id = ?',
+        [status, transactionId],
+        (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            this.db.get(
+              'SELECT * FROM transactions WHERE id = ?',
+              [transactionId],
+              (err, row: Transaction) => {
+                if (err) reject(err);
+                else if (!row) reject(new Error('Transaction not found'));
+                else resolve(row);
+              }
+            );
           }
         }
       );
