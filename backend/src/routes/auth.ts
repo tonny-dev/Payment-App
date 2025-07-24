@@ -1,51 +1,57 @@
 import { Router, Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
 import { body, validationResult } from 'express-validator';
-import { DatabaseService } from '../services/DatabaseService';
-import { generateToken } from '../middleware/auth';
+import { AuthController } from '../controllers/AuthController';
+import { CreateUserDTO } from '../models/User';
 
 const router = Router();
-const db = DatabaseService.getInstance();
+const authController = new AuthController();
 
 // Signup endpoint
 router.post(
   '/signup',
   [
     body('email').isEmail().normalizeEmail(),
-    body('password').isLength({ min: 6 }),
-    body('role').isIn(['psp', 'dev']),
+    body('password')
+      .isLength({ min: 6 })
+      .withMessage('Password must be at least 6 characters long'),
+    body('role')
+      .isIn(['psp', 'dev'])
+      .withMessage('Role must be either "psp" or "dev"'),
   ],
   async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({
+          error: 'Validation failed',
+          details: errors.array(),
+        });
       }
 
-      const { email, password, role } = req.body;
+      const userData: CreateUserDTO = {
+        email: req.body.email,
+        password: req.body.password,
+        role: req.body.role,
+      };
 
-      // Check if user already exists
-      const existingUser = await db.findUserByEmail(email);
-      if (existingUser) {
-        return res.status(409).json({ error: 'User already exists' });
-      }
-
-      // Create user
-      const user = await db.createUser(email, password, role);
-      const token = generateToken(user.id);
+      const { token, user } = await authController.signup(userData);
 
       res.status(201).json({
         message: 'User created successfully',
         token,
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-        },
+        user,
       });
     } catch (error) {
-      console.error('Signup error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      if (error instanceof Error) {
+        if (error.message === 'User already exists') {
+          res.status(409).json({ error: error.message });
+        } else {
+          console.error('Signup error:', error);
+          res.status(500).json({ error: 'Internal server error' });
+        }
+      } else {
+        res.status(500).json({ error: 'Unknown error occurred' });
+      }
     }
   }
 );
@@ -53,42 +59,44 @@ router.post(
 // Login endpoint
 router.post(
   '/login',
-  [body('email').isEmail().normalizeEmail(), body('password').exists()],
+  [
+    body('email')
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Valid email address is required'),
+    body('password')
+      .isLength({ min: 6 })
+      .withMessage('Password must be at least 6 characters long'),
+  ],
   async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({
+          error: 'Validation failed',
+          details: errors.array(),
+        });
       }
 
       const { email, password } = req.body;
-
-      // Find user
-      const user = await db.findUserByEmail(email);
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      // Verify password
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      const token = generateToken(user.id);
+      const { token, user } = await authController.login(email, password);
 
       res.json({
         message: 'Login successful',
         token,
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-        },
+        user,
       });
     } catch (error) {
-      console.error('Login error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      if (error instanceof Error) {
+        if (error.message === 'Invalid credentials') {
+          res.status(401).json({ error: error.message });
+        } else {
+          console.error('Login error:', error);
+          res.status(500).json({ error: 'Internal server error' });
+        }
+      } else {
+        res.status(500).json({ error: 'Unknown error occurred' });
+      }
     }
   }
 );
