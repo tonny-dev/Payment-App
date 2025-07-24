@@ -1,11 +1,11 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
-import { DatabaseService } from '../services/DatabaseService';
-import { WebhookService } from '../services/WebhookService';
+import { TransactionController } from '../controllers/TransactionController';
+import { CreateTransactionDTO } from '../models/Transaction';
 
 const router = Router();
-const db = DatabaseService.getInstance();
+const transactionController = new TransactionController();
 
 // Get user transactions
 router.get(
@@ -13,20 +13,21 @@ router.get(
   authenticateToken,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const transactions = await db.getUserTransactions(req.user!.id);
-      res.json({
-        transactions: transactions.map((t) => ({
-          id: t.id,
-          recipient: t.recipient,
-          amount: t.amount,
-          currency: t.currency,
-          status: t.status,
-          timestamp: t.timestamp,
-        })),
-      });
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const transactions = await transactionController.getUserTransactions(
+        req.user.id
+      );
+      res.json({ transactions });
     } catch (error) {
       console.error('Get transactions error:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: 'Internal server error' });
+      }
     }
   }
 );
@@ -36,58 +37,57 @@ router.post(
   '/send',
   [
     authenticateToken,
-    body('recipient').isLength({ min: 1 }),
+    body('recipient').isLength({ min: 1 }).withMessage('Recipient is required'),
     body('amount')
       .isNumeric()
-      .custom((value) => value > 0),
-    body('currency').isLength({ min: 3, max: 3 }),
+      .withMessage('Amount must be a number')
+      .custom((value) => value > 0)
+      .withMessage('Amount must be greater than 0'),
+    body('currency')
+      .isLength({ min: 3, max: 3 })
+      .withMessage('Currency must be a 3-letter code')
+      .toUpperCase(),
   ],
   async (req: AuthenticatedRequest, res: Response) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
-      const { recipient, amount, currency } = req.body;
-
-      // Create transaction
-      const transaction = await db.createTransaction(
-        req.user!.id,
-        recipient,
-        parseFloat(amount),
-        currency.toUpperCase()
-      );
-
-      // Trigger webhook (bonus feature)
-      try {
-        await WebhookService.triggerPaymentWebhook({
-          transactionId: transaction.id,
-          userId: req.user!.id,
-          recipient,
-          amount: parseFloat(amount),
-          currency: currency.toUpperCase(),
-          timestamp: transaction.timestamp,
+        return res.status(400).json({
+          error: 'Validation failed',
+          details: errors.array(),
         });
-      } catch (webhookError) {
-        console.error('Webhook error:', webhookError);
-        // Don't fail the transaction if webhook fails
       }
+
+      const transactionData: CreateTransactionDTO = {
+        recipient: req.body.recipient,
+        amount: parseFloat(req.body.amount),
+        currency: req.body.currency,
+      };
+
+      const transaction = await transactionController.createTransaction(
+        req.user.id,
+        transactionData
+      );
 
       res.status(201).json({
         message: 'Payment sent successfully',
-        transaction: {
-          id: transaction.id,
-          recipient: transaction.recipient,
-          amount: transaction.amount,
-          currency: transaction.currency,
-          status: transaction.status,
-          timestamp: transaction.timestamp,
-        },
+        transaction,
       });
     } catch (error) {
       console.error('Send payment error:', error);
-      res.status(500).json({ error: 'Payment failed' });
+      if (error instanceof Error) {
+        if (error.message === 'Payment processing failed') {
+          res.status(400).json({ error: error.message });
+        } else {
+          res.status(500).json({ error: 'Payment failed: ' + error.message });
+        }
+      } else {
+        res.status(500).json({ error: 'Unknown error occurred' });
+      }
     }
   }
 );
