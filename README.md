@@ -29,18 +29,148 @@
 
 ## 🚀 Development Setup
 
+### Prerequisites
+- Node.js 16 or higher
+- npm or yarn
+- React Native development environment
+- Android Studio (for Android development)
+- Xcode (for iOS development on macOS)
+- Docker & Docker Compose (optional, for containerized development)
+
+### Quick Setup (Root Level Commands)
+
+1. **Clone and install everything:**
 ```bash
-# Backend Initialization
+git clone <repository-url>
+cd payment-app
+npm install  # Install root dependencies
+npm run install:all  # Install both backend and app dependencies
+```
+
+2. **Development (both services):**
+```bash
+npm run dev  # Runs both backend and app concurrently
+```
+
+3. **Individual services:**
+```bash
+npm run dev:backend   # Backend only
+npm run dev:app       # React Native Metro bundler only
+```
+
+### Individual Setup
+
+#### Backend Setup
+```bash
 cd backend
 npm install
-npm run dev  # http://localhost:3000
-
-# Mobile App Launch
-cd mobile
-npm install
-npx react-native run-ios     # iOS
-npx react-native run-android # Android
+npm run dev  # Development mode with nodemon
+npm run build  # Build TypeScript
+npm start  # Production mode
 ```
+
+#### Mobile App Setup
+```bash
+cd app
+npm install
+npm start  # Start Metro bundler
+npm run android  # Run on Android
+npm run ios  # Run on iOS (macOS only)
+npm run pod-install  # Install iOS pods
+```
+
+### 🐳 Docker Setup
+
+#### Docker Commands (Root Level)
+
+1. **Build and run with Docker Compose:**
+```bash
+npm run docker:dev  # Build and start both services
+```
+
+2. **Individual Docker builds:**
+```bash
+npm run docker:build:backend  # Build backend image
+npm run docker:build:app      # Build app image
+```
+
+3. **Run individual containers:**
+```bash
+npm run docker:run:backend  # Run backend container
+npm run docker:run:app      # Run app container
+```
+
+4. **Stop Docker services:**
+```bash
+npm run docker:stop
+```
+
+#### Manual Docker Commands
+
+**Backend:**
+```bash
+docker build -t payment-backend ./backend
+docker run -p 3000:3000 payment-backend
+```
+
+**App:**
+```bash
+docker build -t payment-app ./app
+docker run -p 8081:8081 payment-app
+```
+
+**Docker Compose:**
+```bash
+docker-compose up --build  # Build and start
+docker-compose down        # Stop and remove containers
+docker-compose logs -f     # Follow logs
+```
+
+### Available Scripts
+
+#### Root Level Scripts
+- `npm run install:all` - Install dependencies for both projects
+- `npm run dev` - Run both backend and app in development mode
+- `npm run build` - Build both projects
+- `npm run test` - Run tests for both projects
+- `npm run clean` - Clean node_modules and build files
+- `npm run lint` - Lint both projects
+- `npm run docker:dev` - Start with Docker Compose
+- `npm run docker:stop` - Stop Docker services
+
+#### Backend Scripts (cd backend)
+- `npm run dev` - Start with nodemon (development)
+- `npm run build` - Build TypeScript
+- `npm start` - Start production server
+
+#### App Scripts (cd app)
+- `npm start` - Start Metro bundler
+- `npm run android` - Run on Android
+- `npm run ios` - Run on iOS
+- `npm run lint` - Run ESLint
+- `npm test` - Run Jest tests
+- `npm run pod-install` - Install iOS pods
+
+## 🔄 Development Workflow
+
+### Standard Development
+1. Install dependencies: `npm run install:all`
+2. Start both services: `npm run dev`
+3. Open another terminal for mobile app:
+   - Android: `cd app && npm run android`
+   - iOS: `cd app && npm run ios`
+
+### Docker Development
+1. Start with Docker: `npm run docker:dev`
+2. Access:
+   - Backend: http://localhost:3000
+   - Metro bundler: http://localhost:8081
+3. Connect your mobile device or emulator to the Metro bundler
+
+### Ports
+- **Backend API**: http://localhost:3000
+- **Metro Bundler**: http://localhost:8081
+- **React Native Debugger**: http://localhost:8097
 
 ## ✅ Implementation Checklist
 

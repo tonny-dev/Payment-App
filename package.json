@@ -1,0 +1,42 @@
+{
+  "name": "payment-app",
+  "version": "1.0.0",
+  "description": "Payment App - Mobile app with Node.js backend",
+  "private": true,
+  "scripts": {
+    "install:all": "npm run install:backend && npm run install:app",
+    "install:backend": "cd backend && npm install",
+    "install:app": "cd app && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:app\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:app": "cd app && npm start",
+    "start:backend": "cd backend && npm start",
+    "start:app": "cd app && npm start",
+    "build": "npm run build:backend && npm run build:app",
+    "build:backend": "cd backend && npm run build",
+    "build:app": "cd app && npm run android",
+    "test": "npm run test:backend && npm run test:app",
+    "test:backend": "cd backend && npm test",
+    "test:app": "cd app && npm test",
+    "docker:build": "npm run docker:build:backend && npm run docker:build:app",
+    "docker:build:backend": "docker build -t payment-backend ./backend",
+    "docker:build:app": "docker build -t payment-app ./app",
+    "docker:run:backend": "docker run -p 3000:3000 --name payment-backend-container payment-backend",
+    "docker:run:app": "docker run -p 8081:8081 --name payment-app-container payment-app",
+    "docker:dev": "docker-compose up --build",
+    "docker:stop": "docker-compose down",
+    "clean": "npm run clean:backend && npm run clean:app",
+    "clean:backend": "cd backend && rm -rf node_modules dist",
+    "clean:app": "cd app && rm -rf node_modules",
+    "lint": "npm run lint:backend && npm run lint:app",
+    "lint:backend": "echo 'No linting configured for backend'",
+    "lint:app": "cd app && npm run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "workspaces": [
+    "backend",
+    "app"
+  ]
+}

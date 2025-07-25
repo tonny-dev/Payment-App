@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: payment-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    volumes:
+      - ./backend/src:/app/src:ro
+      - ./backend/logs:/app/logs
+      - ./backend/database:/app/database
+    networks:
+      - payment-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: payment-app
+    ports:
+      - "8081:8081"
+      - "8097:8097"
+    environment:
+      - NODE_ENV=development
+      - REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0
+    volumes:
+      - ./app/src:/app/src:ro
+      - ./app/assets:/app/assets:ro
+      - ./app/App.tsx:/app/App.tsx:ro
+    networks:
+      - payment-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+networks:
+  payment-network:
+    driver: bridge
+
+volumes:
+  backend_logs:
+  backend_database:
