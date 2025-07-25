@@ -15,7 +15,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@_types/navigation';
 import { useToast } from '@components/ToastProvider';
 import { RootState } from '../store/index';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {  signup, clearError } from '@store/authSlice';
 
 interface SignUpFormData {
