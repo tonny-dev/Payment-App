@@ -12,6 +12,8 @@
     "dev:app": "cd app && npm start",
     "start:backend": "cd backend && npm start",
     "start:app": "cd app && npm start",
+    "ios": "cd app && npm run ios",
+    "android": "cd app && npm run android",
     "build": "npm run build:backend && npm run build:app",
     "build:backend": "cd backend && npm run build",
     "build:app": "cd app && npm run android",
