@@ -7,18 +7,9 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies with verbose logging
-RUN npm ci && \
+# Install dependencies
+RUN npm install && \
     npm install typescript -g
-
-# Copy source code and configuration
-COPY src/ ./src/
-
-# Build the application with verbose output
-RUN echo "Starting build process..." && \
-    npm run build || (echo "Build failed!" && exit 1) && \
-    echo "Build completed." && \
-    ls -la dist/ || (echo "dist directory not found!" && exit 1)
 
 # Copy source code and configuration
 COPY src/ ./src/
@@ -36,7 +27,7 @@ WORKDIR /app
 
 # Copy package files and install production dependencies
 COPY package*.json ./
-RUN npm ci --only=production && \
+RUN npm install --omit=dev && \
     npm cache clean --force
 
 # Copy built application
