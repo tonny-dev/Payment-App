@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import Toast from './Toast';
+import PremiumToast from './PremiumToast';
 
 interface ToastContextType {
-  showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+  showToast: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -23,7 +23,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   const [toast, setToast] = useState<{
     visible: boolean;
     message: string;
-    type: 'success' | 'error' | 'info';
+    type: 'success' | 'error' | 'info' | 'warning';
   }>({
     visible: false,
     message: '',
@@ -31,7 +31,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   });
 
   const showToast = useCallback(
-    (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
       setToast({
         visible: true,
         message,
@@ -51,11 +51,13 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <Toast
+      <PremiumToast
         visible={toast.visible}
         message={toast.message}
         type={toast.type}
-        onDismiss={hideToast}
+        onHide={hideToast}
+        position="top"
+        duration={4000}
       />
     </ToastContext.Provider>
   );

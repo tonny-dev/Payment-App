@@ -8,12 +8,13 @@ const initialState: TransactionState = {
   error: null,
 };
 
+// Async thunks
 export const fetchTransactions = createAsyncThunk(
   'transactions/fetchTransactions',
   async () => {
     const response = await ApiService.getTransactions();
     return response.transactions;
-  },
+  }
 );
 
 export const sendPayment = createAsyncThunk(
@@ -29,20 +30,21 @@ export const sendPayment = createAsyncThunk(
   }) => {
     const response = await ApiService.sendPayment(recipient, amount, currency);
     return response.transaction;
-  },
+  }
 );
 
 const transactionSlice = createSlice({
   name: 'transactions',
   initialState,
   reducers: {
-    clearError: state => {
+    clearError: (state) => {
       state.error = null;
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(fetchTransactions.pending, state => {
+      // Fetch transactions
+      .addCase(fetchTransactions.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
@@ -55,7 +57,8 @@ const transactionSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || 'Failed to fetch transactions';
       })
-      .addCase(sendPayment.pending, state => {
+      // Send payment
+      .addCase(sendPayment.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
