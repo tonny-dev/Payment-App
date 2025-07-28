@@ -4,6 +4,15 @@ import { DatabaseService } from '../services/DatabaseService';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 
+export interface AuthRequest extends Request {
+  user?: {
+    id: number;
+    email: string;
+    role: 'psp' | 'dev';
+  };
+}
+
+// Keep the old interface for backward compatibility
 export interface AuthenticatedRequest extends Request {
   user?: {
     id: number;
@@ -12,8 +21,8 @@ export interface AuthenticatedRequest extends Request {
   };
 }
 
-export const authenticateToken = async (
-  req: AuthenticatedRequest,
+export const auth = async (
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -45,6 +54,9 @@ export const authenticateToken = async (
     res.status(403).json({ error: 'Invalid token' });
   }
 };
+
+// Keep the old function for backward compatibility
+export const authenticateToken = auth;
 
 export const generateToken = (userId: number): string => {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
