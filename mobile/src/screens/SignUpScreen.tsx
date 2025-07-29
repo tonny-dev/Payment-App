@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   roleOptions: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: spacing.md,
   },
   roleOption: {

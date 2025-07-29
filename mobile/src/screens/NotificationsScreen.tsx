@@ -170,13 +170,13 @@ const NotificationsScreen: React.FC = () => {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const FilterButton = ({ 
-    title, 
-    value, 
-    count 
-  }: { 
-    title: string; 
-    value: typeof filter; 
+  const FilterButton = ({
+    title,
+    value,
+    count
+  }: {
+    title: string;
+    value: typeof filter;
     count?: number;
   }) => (
     <TouchableOpacity
@@ -302,7 +302,7 @@ const NotificationsScreen: React.FC = () => {
             <Ionicons name="notifications-off" size={48} color={colors.textTertiary} />
             <Text style={styles.emptyStateTitle}>No notifications</Text>
             <Text style={styles.emptyStateDescription}>
-              {filter === 'all' 
+              {filter === 'all'
                 ? "You're all caught up! New notifications will appear here."
                 : `No ${filter} notifications found.`
               }
@@ -360,6 +360,7 @@ const styles = StyleSheet.create({
   },
   filtersContainer: {
     marginBottom: spacing.md,
+    // height: 40,
   },
   filtersContent: {
     paddingHorizontal: spacing.lg,
@@ -372,6 +373,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
     backgroundColor: colors.gray100,
+    height: 40,
+    width: 'auto',
   },
   filterButtonActive: {
     backgroundColor: colors.primary,
@@ -400,6 +403,9 @@ const styles = StyleSheet.create({
   },
   notificationsList: {
     flex: 1,
+    flexGrow: 1,
+    flexShrink: 1,
+    paddingTop: 0,
   },
   notificationsContent: {
     paddingHorizontal: spacing.lg,

@@ -25,7 +25,7 @@ interface SearchFilter {
 const SearchScreen: React.FC = () => {
   const { transactions } = useSelector((state: RootState) => state.transactions);
   const { showToast } = useToast();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
@@ -66,21 +66,21 @@ const SearchScreen: React.FC = () => {
 
     // Type filter
     if (filters.type !== 'all') {
-      filtered = filtered.filter(transaction => 
+      filtered = filtered.filter(transaction =>
         (transaction as any).type === filters.type
       );
     }
 
     // Status filter
     if (filters.status !== 'all') {
-      filtered = filtered.filter(transaction => 
+      filtered = filtered.filter(transaction =>
         (transaction as any).status === filters.status
       );
     }
 
     // Currency filter
     if (filters.currency !== 'all') {
-      filtered = filtered.filter(transaction => 
+      filtered = filtered.filter(transaction =>
         transaction.currency === filters.currency
       );
     }
@@ -89,7 +89,7 @@ const SearchScreen: React.FC = () => {
     if (filters.dateRange !== 'all') {
       const now = new Date();
       const filterDate = new Date();
-      
+
       switch (filters.dateRange) {
         case 'today':
           filterDate.setHours(0, 0, 0, 0);
@@ -104,8 +104,8 @@ const SearchScreen: React.FC = () => {
           filterDate.setFullYear(now.getFullYear() - 1);
           break;
       }
-      
-      filtered = filtered.filter(transaction => 
+
+      filtered = filtered.filter(transaction =>
         new Date(transaction.timestamp) >= filterDate
       );
     }
@@ -114,8 +114,8 @@ const SearchScreen: React.FC = () => {
     if (filters.amountRange.min || filters.amountRange.max) {
       const min = parseFloat(filters.amountRange.min) || 0;
       const max = parseFloat(filters.amountRange.max) || Infinity;
-      
-      filtered = filtered.filter(transaction => 
+
+      filtered = filtered.filter(transaction =>
         transaction.amount >= min && transaction.amount <= max
       );
     }
@@ -144,13 +144,13 @@ const SearchScreen: React.FC = () => {
     showToast('Filters cleared', 'success');
   };
 
-  const FilterChip = ({ 
-    label, 
-    active, 
-    onPress 
-  }: { 
-    label: string; 
-    active: boolean; 
+  const FilterChip = ({
+    label,
+    active,
+    onPress
+  }: {
+    label: string;
+    active: boolean;
     onPress: () => void;
   }) => (
     <TouchableOpacity
@@ -262,9 +262,9 @@ const SearchScreen: React.FC = () => {
           <PremiumInput
             placeholder="Min amount"
             value={filters.amountRange.min}
-            onChangeText={(value) => 
-              setFilters(prev => ({ 
-                ...prev, 
+            onChangeText={(value) =>
+              setFilters(prev => ({
+                ...prev,
                 amountRange: { ...prev.amountRange, min: value }
               }))
             }
@@ -276,9 +276,9 @@ const SearchScreen: React.FC = () => {
           <PremiumInput
             placeholder="Max amount"
             value={filters.amountRange.max}
-            onChangeText={(value) => 
-              setFilters(prev => ({ 
-                ...prev, 
+            onChangeText={(value) =>
+              setFilters(prev => ({
+                ...prev,
                 amountRange: { ...prev.amountRange, max: value }
               }))
             }
@@ -345,10 +345,10 @@ const SearchScreen: React.FC = () => {
           onPress={() => setShowFilters(!showFilters)}
           activeOpacity={0.7}
         >
-          <Ionicons 
-            name="options" 
-            size={20} 
-            color={showFilters ? colors.primary : colors.textSecondary} 
+          <Ionicons
+            name="options"
+            size={20}
+            color={showFilters ? colors.primary : colors.textSecondary}
           />
         </TouchableOpacity>
       </View>
@@ -423,6 +423,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.md,
     gap: spacing.sm,
@@ -447,6 +448,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
     backgroundColor: colors.gray100,
+    height: 40,
+    width: 'auto',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterChipActive: {
     backgroundColor: colors.primary,
@@ -530,6 +535,8 @@ const styles = StyleSheet.create({
   },
   resultsContainer: {
     flex: 1,
+    paddingTop: spacing.sm,
+    justifyContent: 'flex-start',
   },
   resultsHeader: {
     flexDirection: 'row',
