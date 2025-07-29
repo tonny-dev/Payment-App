@@ -2,15 +2,11 @@
 
 > A robust, production-grade React Native mobile application with Node.js backend for payment processing, implementing industry-standard security practices and modern architecture patterns.
 
-<iframe
-  src="https://www.loom.com/share/fb3fd8f211e34c43a5091ffe238926bb?sid=af5d23b4-a0a6-4396-8946-00cb06948483"
-  frameborder="0"
-  webkitallowfullscreen
-  mozallowfullscreen
-  allowfullscreen
-  style="width:100%; height:400px;">
-</iframe>
+### 🎥 Live Demo (Loom Video)
 
+> _Click below to watch a premium demo walkthrough of the Payment App (opens in new tab)._
+
+[![Watch Demo Video](https://cdn.loom.com/sessions/thumbnails/fb3fd8f211e34c43a5091ffe238926bb-with-play.jpg)](https://www.loom.com/share/fb3fd8f211e34c43a5091ffe238926bb?sid=af5d23b4-a0a6-4396-8946-00cb06948483)
 
 📚 [View Full API Documentation](./api-docs.md)
 
